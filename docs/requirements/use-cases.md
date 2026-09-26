@@ -1522,6 +1522,85 @@ Details:
 **Assumptions:**
 **Open Issues:**
 
+### **UC-STU-remind-missing-submissions: The instructor reminds students of missing submissions**
+
+**UC ID and Name:** UC-STU-remind-missing-submissions: Remind students of their missing submissions
+**Created By:** Tanner
+**Date Created:** September 26, 2026
+**Primary Actor:** Course Admin / Instructor
+**Secondary Actors:**
+**Trigger:** The instructor indicates to remind students of missing submissions for a course section
+**Description:** The instructor wants to remind students with outstanding/missing submissions of their particular task so that they can remember to submit them without spamming students with everything completed.
+
+**Preconditions:**
+- PRE-1. The instructor is logged into the system.
+- PRE-2. The instructor is assigned to the course section (BR-section-scoped-access).
+
+**Postconditions:**
+- POST-1. Each eligible student with a missing submission recieves one email naming the artifacts she has not submitted for the selected week (BR-submission-outstanding).
+- POST-2. A student with no outstanding submissions is sent no reminder.
+- POST-3. The instructor is told which students could not be emailed.
+- POST-4. Each reminder sent is recorded.
+
+**Main Success Scenario:**
+1. The instructor indictes they want to remind students of their missing submissions for a course they are assigned to.
+2. The system asks the course admin to select the active week for the reminder.
+3. The instructor can view the missing submissions by course section and by student.
+4. The system displays the students and their missing artifacts.
+5. The system displays the reminder message.
+6. The instructor confirms the send or terminates the use case.
+7. The system sends out the reminder(s) to the students with outstanding tasks reminders only of the tasks they have yet to complete. 
+8. The instructor can see how many reminders were sent and to who.
+9. Use case ends.
+
+**Extensions:**
+- 3a. The deadline for every artifact in the selected week has already passed:
+  - The system informs the instructor that reminders can no longer help for that week and returns to step 2.
+- 4a. The selected week is not one of the course section's active weeks:
+  - 4a1. The system treats no peer evaluation as outstanding for that week (BR-active-weeks). It evaluates weekly activity reports per BR-submission-outstanding and continues at step 5, or at 4f if nothing is outstanding.
+- 4b. The peer evaluation submission window for the selected week has closed:
+  - 4b1. The system treats no peer evaluation as outstanding, since a missed evaluation cannot be made up (BR-evaluation-submission-window). It informs the instructor that peer evaluations for that week can no longer be submitted, and continues at step 5 for weekly activity reports.
+- 4c. A student in the course section is not assigned to a team:
+  - 4c1. The system does not treat her as having an outstanding submission and sends her no reminder (BR-team-assignment-required).
+  - 4c2. The system lists her separately as not assigned to a team, so the instructor can follow up with the course admin.
+- 4d. A student in the course section is deactivated:
+  - 4d1. The system excludes her from the list and sends her no reminder (BR-student-lifecycle).
+- 4e. A student recorded activities for the week and then deleted all of them:
+  - 4e1. The system treats her weekly activity report as outstanding (BR-submission-outstanding) and continues at step 5.
+- 4f. No student has an outstanding submission for the selected week:
+  - 4f1. The system informs the instructor that no reminders are needed. Use case ends.
+- 5a. One or more listed students were already reminded within the interval set by BR-reminder-limit:
+  - 5a1. The system marks those students as recently reminded, excludes them from this send, and continues.
+- 6a. The instructor indicates to personalize the default reminder message:
+  - 6a1. The instructor edits the message and confirms, and the flow returns to step 6.
+- 8a. A student submits the missing artifact after step 5 but before the reminder is sent:
+  - 8a1. The system rechecks each student against BR-submission-outstanding at send time and skips anyone no longer outstanding.
+- 8b. The system cannot email one or more of the students:
+  - 8b1. The system continues with the remaining students rather than abandoning the batch.
+  - 8b2. The system reports which students it could not email. A failed send is not recorded as a reminder, so it does not count against BR-reminder-limit.
+  - 8b3. Use case ends.
+
+**Priority:** Medium
+**Frequency of Use:** Approximately 2 users, 1-2 usages per course section per week.
+**Business Rules:** BR-section-scoped-access, BR-role-based-access, BR-submission-outstanding, BR-reminder-limit, BR-active-weeks, BR-evaluation-submission-window, BR-team-assignment-required, BR-student-lifecycle
+
+**Associated Information:**
+- Display: For each student with an outstanding submission, show her name, team, and the missing artifact(s). Sort by team name, then last name, both ascending.
+- Reminder content: Send one email per student. It names only her own missing artifacts and the week. It never names, CCs, or BCCs any other student (CO-ferpa, BR-section-scoped-access). Deliver it as email per CI-email-notifications.
+- Default message: Subject: Project Pulse Submission Reminder. Hello [first name], our records show you have not yet submitted your [weekly activity report / peer evaluation / weekly activity report and peer evaluation] for the week of [week]. [For a peer evaluation: The submission window closes on [date].] Please log in to Project Pulse to complete it.
+- Recording: Each successfully sent reminder is recorded with the student, artifact, week, sending instructor, and time, so that BR-reminder-limit can be enforced.
+- Consistency: The list must agree with the "did not turn in" rows of UC-WAR-team-war-report and UC-EVA-section-evaluation-report for the same week.
+- Related requirement: The scheduled reminder (FR-NOT-weekly-reminder) should apply the same BR-submission-outstanding, so both paths share a single definition.
+- Cancellation: The instructor shall be able to cancel the use case at any time before confirming the send.
+
+**Assumptions:** 
+- AS-one-section-per-student: a student belongs to one course section, so "her section's week" is unambiguous.
+- The email address on the student's account is where reminders are delivered.
+
+**Open Issues:** 
+- Should students not assigned to a team (4c) be flagged to the course admin automatically, rather than left to the instructor?
+
+
 ## **Instructor**
 
 ### **UC-INS-invite-instructors: The course admin invites instructors to register an account**
