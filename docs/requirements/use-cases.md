@@ -1598,7 +1598,6 @@ Details:
 - The email address on the student's account is where reminders are delivered.
 
 **Open Issues:** 
-- Do scheduled reminders (FR-NOT-weekly-reminder) count toward BR-reminder-limit, or only instructor-triggered ones?
 - Should students not assigned to a team (4c) be flagged to the course admin automatically, rather than left to the instructor?
 
 
